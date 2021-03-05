@@ -10,10 +10,26 @@ from util import *
 import speech_recognition as sr
 import requests, shutil, os, time, re
 from pygame import mixer
-from settings import VOICERSS_KEY
+from settings import VOICERSS_KEY, VK_TOKEN, VK_USER_ID
+import vk_api
+from vk_api.longpoll import VkLongPoll, VkEventType
+
 
 mixer.init()
 r = sr.Recognizer()
+vk = vk_api.VkApi(token=VK_TOKEN)
+longpoll = VkLongPoll(vk)
+
+
+def write_msg_vk(user_id, message):
+    random_id = vk_api.utils.get_random_id()
+    vk.method('messages.send', {'user_id': user_id, 'message': message, 'random_id': random_id})
+    #vk_api.upload.VkUpload()
+
+
+
+def get_new_posts():
+    print('')
 
 
 def playmp3(filepath):
@@ -51,7 +67,7 @@ def speakme(mytext):
 
 def listenmic():
     num_keywords = 1
-    print('Waiting hotword jarvis:')
+    print('Waiting hotword:')
     porcupine = None
     pa = None
     audio_stream = None
@@ -74,11 +90,13 @@ def listenmic():
                 try:
                     print(r.recognize_google(audio, language="ru-RU"))
                     phrase = r.recognize_google(audio, language="ru-RU")
-                    speakme(phrase)
-                    print('Waiting hotword jarvis:')
+                    if phrase == 'Отправь мем':
+                        speakme('Отправляю')
+                        write_msg_vk(VK_USER_ID, phrase)
+                    print('Waiting hotword:')
                 except sr.UnknownValueError:
                     print("Voice assistant cannot hear phrase")
-                    print('Waiting hotword jarvis:')
+                    print('Waiting hotword:')
                 except sr.RequestError as e:
                     print("Service error; {0}".format(e))
 
@@ -89,4 +107,5 @@ def listenmic():
     _AUDIO_DEVICE_INFO_KEYS = ['index', 'name', 'defaultSampleRate', 'maxInputChannels']
 
 
-listenmic()
+if __name__ == '__main__':
+    listenmic()
