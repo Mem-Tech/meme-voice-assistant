@@ -4,65 +4,22 @@ import sys
 from datetime import datetime
 import numpy as np
 import pyaudio
-import soundfile
 from porcupine import Porcupine
 from util import *
 import speech_recognition as sr
-import requests, shutil, os, time, re
-from pygame import mixer
-from settings import VOICERSS_KEY, VK_TOKEN, VK_USER_ID
+from settings import VK_TOKEN, VK_USER_ID
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
+from vk_part.vktools import write_msg_vk
+from tools.mp3tools import playmp3, speakme
 
-
-mixer.init()
 r = sr.Recognizer()
 vk = vk_api.VkApi(token=VK_TOKEN)
 longpoll = VkLongPoll(vk)
 
 
-def write_msg_vk(user_id, message):
-    random_id = vk_api.utils.get_random_id()
-    vk.method('messages.send', {'user_id': user_id, 'message': message, 'random_id': random_id})
-    #vk_api.upload.VkUpload()
-
-
-
 def get_new_posts():
     print('')
-
-
-def playmp3(filepath):
-    global stop
-    stop = 0
-    song = mixer.music.load(filepath)
-    mixer.music.play()
-    while mixer.music.get_busy():
-        time.sleep(0.1)
-        if (stop == 1):
-            break
-    mixer.music.stop()
-
-
-def speakme(mytext):
-    print('Voice assistait said: ' + mytext)
-    fm = 'mp3/' + re.sub('[^а-яА-Я]', '', mytext)
-    fm = fm[:200]
-    fm = fm + '.mp3'
-    if not (os.path.exists(fm)):
-        mytext = mytext.replace(' ', '+')
-        api_url = "http://api.voicerss.org/"
-        querystring = {"key": VOICERSS_KEY, "hl": "ru-ru", "c": "mp3", "f": "44khz_16bit_stereo",
-                       "src": mytext}
-        headers = {
-            'x-rapidapi-key': VOICERSS_KEY,
-            'x-rapidapi-host': "api.voicerss.org"
-        }
-        r = requests.request("GET", api_url, headers=headers, params=querystring)
-        if r.status_code == 200:
-            open(fm, 'wb').write(r.content)
-
-    playmp3(fm)
 
 
 def listenmic():
@@ -92,7 +49,7 @@ def listenmic():
                     phrase = r.recognize_google(audio, language="ru-RU")
                     if phrase == 'Отправь мем':
                         speakme('Отправляю')
-                        write_msg_vk(VK_USER_ID, phrase)
+                        write_msg_vk(vk_api, vk, VK_USER_ID, phrase)
                     print('Waiting hotword:')
                 except sr.UnknownValueError:
                     print("Voice assistant cannot hear phrase")
