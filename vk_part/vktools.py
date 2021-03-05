@@ -26,12 +26,12 @@ def get_memes(vk_api, vk_session, id, number_of_posts):
     meme_posts = []
 
     for post in wall['items']:
-        print(post['text'])
+        #print(post['text'])
         text = post['text']
-        if post['marked_as_ads'] == 0:
-            for att in post['attachments']:
-                meme_post = MemePost(text, att)
-                meme_posts.append(meme_post)
+        #if post['marked_as_ads'] == 0:
+        for att in post['attachments']:
+            meme_post = MemePost(text, att)
+            meme_posts.append(meme_post)
 
     return meme_posts
 
@@ -50,7 +50,7 @@ def get_random_meme(ids):
 
     #ext_posts = [x for x in ext_posts if x]
     not_null_atts_post = []
-    print(ext_posts)
+    #print(ext_posts)
     for post in ext_posts:
         if post.formatted_photos:
             not_null_atts_post.append(post)

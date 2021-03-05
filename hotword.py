@@ -2,6 +2,8 @@ import os
 import struct
 import sys
 from datetime import datetime
+from time import sleep
+
 import numpy as np
 import pyaudio
 from porcupine import Porcupine
@@ -30,7 +32,7 @@ def auth_handler():
     return key, remember_device
 
 
-#vk_session = vk_api.VkApi(VK_USER_LOGIN, VK_USER_PASS, auth_handler=auth_handler, scope='messages')
+# vk_session = vk_api.VkApi(VK_USER_LOGIN, VK_USER_PASS, auth_handler=auth_handler, scope='messages')
 vk_session = vk_api.VkApi(token=VK_TOKEN)
 
 try:
@@ -56,8 +58,42 @@ assistant_meme_words = {
     1: 'отправь мем',
     2: 'отошли мем',
     3: 'пошли мем',
-    4: 'отправить мем'
+    4: 'отправить мем',
+    5: 'мем'
 }
+
+chat_names = {
+    1: 'техномемы',
+    2: 'техно мемы',
+    3: 'мемы',
+    4: 'техно'
+}
+
+
+def where_to_send():
+    # playmp3("mp3/activation.mp3")
+    with sr.Microphone() as source:
+        audio = r.listen(source)
+
+    try:
+        print(r.recognize_google(audio, language="ru-RU"))
+        phrase = r.recognize_google(audio, language="ru-RU")
+        for chat in chat_names.values():
+            if phrase.lower() == chat:
+                mem_post = get_random_meme(VK_PUBLIC_IDS)
+                atts = mem_post.formatted_photos
+                text = mem_post.text
+                write_msg_vk_chat(vk_api, vk, VK_CHAT_ID, text, atts)
+                speakme('отправила!')
+    except sr.UnknownValueError:
+        print("Voice assistant cannot hear phrase")
+        speakme('Не услышала')
+        print('Waiting hotword:')
+
+    except sr.RequestError as e:
+        print("Service error; {0}".format(e))
+    #finally:
+    #    speakme('повтори')
 
 
 def listenmic():
@@ -88,18 +124,20 @@ def listenmic():
 
                     for value in assistant_meme_words.values():
                         if phrase.lower() == value:
-                            speakme('Отправляю')
-                            mem_post = get_random_meme(VK_PUBLIC_IDS)
+                            speakme('куда')
+                            where_to_send()
+                            # mem_post = get_random_meme(VK_PUBLIC_IDS)
+                            # atts = mem_post.formatted_photos
+                            # text = mem_post.text
+                            # write_msg_vk_chat(vk_api, vk, VK_CHAT_ID, text, atts)
 
-                            atts = mem_post.formatted_photos
-                            text = mem_post.text
-                            #write_msg_vk_user(vk_api, vk, VK_USER_ID, text, atts)
-                            write_msg_vk_chat(vk_api, vk, VK_CHAT_ID, text, atts)
+                            # write_msg_vk_chat(vk_api, vk, VK_CHAT_ID, text, atts)
                             print(value)
 
                     print('Waiting hotword:')
                 except sr.UnknownValueError:
                     print("Voice assistant cannot hear phrase")
+                    speakme('Не услышала')
                     print('Waiting hotword:')
                 except sr.RequestError as e:
                     print("Service error; {0}".format(e))
