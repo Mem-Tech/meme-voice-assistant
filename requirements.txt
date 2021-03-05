@@ -1,0 +1,6 @@
+numpy
+pyaudio
+soundfile
+pvporcupine
+speech_recognition
+vk_api
