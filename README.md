@@ -22,6 +22,7 @@ Setup enviroment variables:
         
         VK_CHAT_ID
 
+
 main == hotworld.py
 
 Currently works on Windows 10 X64
