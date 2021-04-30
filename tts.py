@@ -1,8 +1,13 @@
 import requests
-from settings import VOICERSS_KEY
-
+from settings import VOICERSS_KEY,VOICE_API_ID
 
 def tts(text):
+    if VOICE_API_ID==0:
+        voicerss_tts(text)
+    else:
+        rise Exception('VOICE_API_ID not found')
+
+def voicerss_tts(text):
     url = "http://api.voicerss.org/"
     querystring = {"key": VOICERSS_KEY, "hl": "ru-ru", "c": "mp3", "f": "44khz_16bit_stereo",
                    "src": text}
