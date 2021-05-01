@@ -2,7 +2,7 @@
 
 It listen to hotword `Jarvis`, translates Text-To-Speech (RUS) and posting memes
 
-Install requirements: `pip install requirements.txt`
+Install requirements: `pip install -r requirements.txt`
 
 Setup enviroment variables:
 
